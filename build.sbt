@@ -1,6 +1,7 @@
 import sbt.Keys.version
 import sbt.{ Def, Global, Tags }
 import com.github.sbt.git.SbtGit.GitKeys.useConsoleForROGit
+import org.typelevel.scalacoptions.ScalacOptions
 
 import scala.collection.immutable.SortedSet
 import MonixBuildUtils._
@@ -41,18 +42,18 @@ addCommandAlias(
 // ------------------------------------------------------------------------------------------------
 // Dependencies - Versions
 
-val cats_Version              = "2.7.0"
+val cats_Version              = "2.13.0"
 val catsEffect_Version        = "2.5.5"
 val fs2_Version               = "2.5.11"
-val jcTools_Version           = "3.3.0"
-val reactiveStreams_Version   = "1.0.3"
-val macrotaskExecutor_Version = "1.0.0"
+val jcTools_Version           = "4.0.5"
+val reactiveStreams_Version   = "1.0.4"
+val macrotaskExecutor_Version = "1.1.1"
 val minitest_Version          = "2.9.6"
 val implicitBox_Version       = "0.3.4"
 val kindProjector_Version     = "0.13.4"
 val betterMonadicFor_Version  = "0.3.1"
 val silencer_Version          = "1.7.19"
-val scalaCompat_Version       = "2.7.0"
+val scalaCompat_Version       = "2.14.0"
 
 // The Monix version with which we must keep binary compatibility.
 // https://github.com/lightbend/mima#sbt
@@ -417,10 +418,11 @@ lazy val unidocSettings = Seq(
     ),
 
   // Exclude monix.*.internal from ScalaDoc
-  ScalaUnidoc / unidoc / sources ~= (_.filterNot { file =>
-    // Exclude all internal Java files from documentation
-    file.getCanonicalPath.matches("^.*monix.+?internal.*?\\.java$")
-  }),
+  ScalaUnidoc / unidoc / sources ~=
+    (_.filterNot { file =>
+      // Exclude all internal Java files from documentation
+      file.getCanonicalPath.matches("^.*monix.+?internal.*?\\.java$")
+    }),
   ScalaUnidoc / unidoc / scalacOptions +=
     "-Xfatal-warnings",
   ScalaUnidoc / unidoc / scalacOptions --=
@@ -589,7 +591,7 @@ lazy val coreProfile =
     projectName    = "monix",
     withMimaChecks = false,
     withDocTests   = false,
-    crossSettings = Seq(
+    crossSettings  = Seq(
       description := "Root project for Monix, a library for asynchronous programming in Scala. See: https://monix.io"
     )
   )
@@ -621,7 +623,8 @@ lazy val executionShadedJCTools = project
   )
   .settings(assemblyShadeSettings)
   .settings(
-    description := "Monix Execution Shaded JCTools is a shaded version of JCTools library. See: https://github.com/JCTools/JCTools",
+    description :=
+      "Monix Execution Shaded JCTools is a shaded version of JCTools library. See: https://github.com/JCTools/JCTools",
     libraryDependencies := Seq(jcToolsLib % "optional;provided"),
     // https://github.com/sbt/sbt-assembly#shading
     assembly / assemblyShadeRules := Seq(
@@ -637,8 +640,8 @@ lazy val executionShadedJCTools = project
 
 lazy val executionAtomicProfile =
   crossModule(
-    projectName  = "monix-execution-atomic",
-    withDocTests = true,
+    projectName   = "monix-execution-atomic",
+    withDocTests  = true,
     crossSettings = Seq(
       description := "Sub-module of Monix, exposing low-level atomic references. See: https://monix.io",
     )
@@ -657,10 +660,11 @@ lazy val executionAtomicJS = project.in(file("monix-execution/atomic/js"))
 
 lazy val executionProfile =
   crossModule(
-    projectName  = "monix-execution",
-    withDocTests = false,
+    projectName   = "monix-execution",
+    withDocTests  = false,
     crossSettings = Seq(
-      description := "Sub-module of Monix, exposing low-level primitives for dealing with async execution. See: https://monix.io",
+      description :=
+        "Sub-module of Monix, exposing low-level primitives for dealing with async execution. See: https://monix.io",
       libraryDependencies += implicitBoxLib.value
     )
   )
@@ -685,9 +689,10 @@ lazy val executionJS = project
 
 lazy val catnapProfile =
   crossModule(
-    projectName = "monix-catnap",
+    projectName   = "monix-catnap",
     crossSettings = Seq(
-      description := "Sub-module of Monix, exposing pure abstractions built on top of the Cats-Effect type classes. See: https://monix.io",
+      description :=
+        "Sub-module of Monix, exposing pure abstractions built on top of the Cats-Effect type classes. See: https://monix.io",
       libraryDependencies += catsEffectLib.value
     )
   )
@@ -707,7 +712,7 @@ lazy val catnapJS = project
 
 lazy val evalProfile =
   crossModule(
-    projectName = "monix-eval",
+    projectName   = "monix-eval",
     crossSettings = Seq(
       description := "Sub-module of Monix, exposing Task and Coeval, for suspending side-effects. See: https://monix.io"
     )
@@ -730,9 +735,10 @@ lazy val evalJS = project
 
 lazy val tailProfile =
   crossModule(
-    projectName = "monix-tail",
+    projectName   = "monix-tail",
     crossSettings = Seq(
-      description := "Sub-module of Monix, exposing Iterant for purely functional pull based streaming. See: https://monix.io"
+      description :=
+        "Sub-module of Monix, exposing Iterant for purely functional pull based streaming. See: https://monix.io"
     )
   )
 
@@ -753,9 +759,10 @@ lazy val tailJS = project
 
 lazy val reactiveProfile =
   crossModule(
-    projectName = "monix-reactive",
+    projectName   = "monix-reactive",
     crossSettings = Seq(
-      description := "Sub-module of Monix, exposing the Observable pattern for modeling of reactive streams. See: https://monix.io"
+      description :=
+        "Sub-module of Monix, exposing the Observable pattern for modeling of reactive streams. See: https://monix.io"
     )
   )
 
@@ -800,7 +807,7 @@ lazy val reactiveTests = project
   .settings(
     libraryDependencies ++= Seq(
       reactiveStreamsTCKLib % Test,
-      "org.scalatestplus"  %% "testng-7-5" % "3.2.12.0" % Test,
+      "org.scalatestplus"  %% "testng-7-5" % "3.2.14.0" % Test,
     )
   )
 

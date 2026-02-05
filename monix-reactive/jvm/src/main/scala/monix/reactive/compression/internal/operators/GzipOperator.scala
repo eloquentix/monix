@@ -179,8 +179,9 @@ private final class Gzipper(
       gzipMagicFirstByte,
       gzipMagicSecondByte,
       gzipCompressionMethod.DEFLATE,
-      (gzipFlag.FHCRC + fileName.fold(zeroByte)(_ => gzipFlag.FNAME) + comment
-        .fold(zeroByte)(_ => gzipFlag.FCOMMENT)).toByte,
+      (gzipFlag.FHCRC + fileName.fold(zeroByte)(_ => gzipFlag.FNAME) +
+        comment
+          .fold(zeroByte)(_ => gzipFlag.FCOMMENT)).toByte,
       (secondsSince197001010000 & 0xff).toByte,
       ((secondsSince197001010000 >> 8) & 0xff).toByte,
       ((secondsSince197001010000 >> 16) & 0xff).toByte,
@@ -215,8 +216,9 @@ private final class Gzipper(
       (crc32Value & 0xff).toByte,
       ((crc32Value >> 8) & 0xff).toByte
     )
-    header ++ fileNameEncoded.getOrElse(Array.emptyByteArray) ++ commentEncoded
-      .getOrElse(Array.emptyByteArray) ++ crc16
+    header ++ fileNameEncoded.getOrElse(Array.emptyByteArray) ++
+      commentEncoded
+        .getOrElse(Array.emptyByteArray) ++ crc16
   }
 }
 
